@@ -5,12 +5,18 @@ class Network:
     def __init__(self, agents, edges):
         self.agents = agents
         self.edges = edges
+        self.setNeighbors()
+
+    def setNeighbors(self):
+        for edge in self.edges:
+            edge.agent1.addNeighbor(edge.agent2)
+            edge.agent2.addNeighbor(edge.agent1)
 
     def __str__(self):
         string = '------------------------------ Network ------------------------------\n'
         string += '-- Agents (' + str(len(self.agents)) + ') ----------------------------------\n'
         for agent in self.agents:
-            string += str(agent) + ', '
+            string += str(agent) + '\n\n'
         string += '\n-- Edges (' + str(len(self.edges)) + ') ------------------------------------\n'
         for edge in self.edges:
             string += str(edge) + ', '
