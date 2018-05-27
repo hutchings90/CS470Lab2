@@ -1,4 +1,5 @@
 import random
+import copy
 import Network
 from Tap import Tap
 
@@ -25,6 +26,38 @@ class DiffusionOfInnovations:
                 print(str(agent.id) + '-' + str(agent.choice), end=', ')
             print()
 
+    def diffusionRun(self, n):
+        self.reset()
+        for network in self.networks:
+            roundOne = True
+            ids = list(range(len(network.agents)))
+            random.shuffle(ids)
+            for i in range(n):
+                network.agents[ids[i]].adoptEarly()
+            hasChanged = True
+            while hasChanged:
+                hasChanged = False
+                copyAgents = copy.deepcopy(network.agents)
+                for i in ids:
+                    agent = network.agents[i]
+                    if agent.earlyAdopter == False:
+                        hunt = agent.hunt
+                        agent.chooseHunt(copyAgents[i].neighbors, roundOne)
+                        if hunt != agent.hunt:
+                            hasChanged = True
+            roundOne = False
+            print('stags', end='\t')
+            for i in ids:
+                agent = network.agents[i]
+                if agent.hunt == 0:
+                    print(agent.id, end=', ')
+            print('\nhares', end='\t')
+            for i in ids:
+                agent = network.agents[i]
+                if agent.hunt == 1:
+                    print(agent.id, end=', ')
+            print('\n')
+
     def reset(self):
         self.taps = [0] * 3
         for i in range(len(self.taps)):
@@ -39,4 +72,5 @@ class DiffusionOfInnovations:
         return string
 
 diffusionOfInnovations = DiffusionOfInnovations()
-diffusionOfInnovations.cascadeRuns()
+diffusionOfInnovations.diffusionRun(1)
+diffusionOfInnovations.diffusionRun(2)

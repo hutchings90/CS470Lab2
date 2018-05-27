@@ -2,7 +2,10 @@ import random
 
 class Agent:
     likelihoods = [[1 / 2, 1 / 4, 1 / 4], [1 / 4, 1 / 2, 1 / 4], [1 / 4, 1 / 4, 1 / 2]]
-    utilities = [30, 30, 30]
+    utilities = [
+        [[2, 2], [0, 1]],
+        [[1, 0], [1, 1]]
+    ]
 
     def __init__(self, i):
         self.id = i
@@ -10,6 +13,7 @@ class Agent:
         self.neighbors = []
         self.choice = None
         self.earlyAdopter = False
+        self.hunt = 1
 
     def addNeighbor(self, neighbor):
         self.neighbors.append(neighbor)
@@ -53,3 +57,18 @@ class Agent:
         for neighbor in self.neighbors:
             string += str(neighbor.id) + ', '
         return string
+
+    def adoptEarly(self):
+        self.earlyAdopter = True
+        self.hunt = 0
+
+    def chooseHunt(self, neighbors, y):
+        changeCount = 0
+        stayCount = 0
+        mySwitch = (self.hunt + 1) % 2
+        for neighbor in neighbors:
+            changeCount += Agent.utilities[mySwitch][neighbor.hunt][0]
+            stayCount += Agent.utilities[self.hunt][neighbor.hunt][0]
+        if changeCount > stayCount:
+            self.hunt = mySwitch
+        return self.hunt
