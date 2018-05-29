@@ -5,35 +5,45 @@ from Tap import Tap
 
 class DiffusionOfInnovations:
     def cascadeRuns(self):
-        n = random.randint(1, 3)
-        self.cascadeRun(None, n)
-        self.cascadeRun([1, 0, 0], n)
-        self.cascadeRun([0, 1 / 2, 1 / 2], n)
+        self.cascadeRun(None)
+        self.cascadeRun([1, 0, 0])
+        self.cascadeRun([0, 1 / 2, 1 / 2])
+        print('------------------------------')
 
-    def cascadeRun(self, priors, n):
+    def cascadeRun(self, priors):
         self.reset()
-        print()
+        print(priors)
         for network in self.networks:
             ids = list(range(len(network.agents)))
             random.shuffle(ids)
             if priors != None:
-                for i in range(n):
-                    network.agents[ids[i]].priors = priors
+                network.agents[ids[0]].priors = copy.deepcopy(priors)
             for i in ids:
                 agent = network.agents[i]
-                priors = agent.priors
                 agent.chooseTap()
                 print(str(agent.id) + '-' + str(agent.choice), end=', ')
             print()
+        print()
 
     def diffusionRun(self, n):
         self.reset()
+        asdf = 0
         for network in self.networks:
+            generations = 0
+            asdf += 1
             roundOne = True
             ids = list(range(len(network.agents)))
-            random.shuffle(ids)
-            for i in range(n):
-                network.agents[ids[i]].adoptEarly()
+            if asdf == 4:
+                network.agents[0].adoptEarly()
+                network.agents[5].adoptEarly()
+                network.agents[7].adoptEarly()
+                network.agents[9].adoptEarly()
+                network.agents[11].adoptEarly()
+                network.agents[12].adoptEarly()
+            else:
+                random.shuffle(ids)
+                for i in range(n):
+                    network.agents[ids[i]].adoptEarly()
             hasChanged = True
             while hasChanged:
                 hasChanged = False
@@ -44,7 +54,11 @@ class DiffusionOfInnovations:
                         hunt = agent.hunt
                         agent.chooseHunt(copyAgents[i].neighbors, roundOne)
                         if hunt != agent.hunt:
+                            print(agent.id, end=', ')
                             hasChanged = True
+                if hasChanged:
+                    generations += 1
+                print()
             roundOne = False
             print('stags', end='\t')
             for i in ids:
@@ -56,7 +70,7 @@ class DiffusionOfInnovations:
                 agent = network.agents[i]
                 if agent.hunt == 1:
                     print(agent.id, end=', ')
-            print('\n')
+            print('\nGenerations:', generations, '\n')
 
     def reset(self):
         self.taps = [0] * 3
@@ -72,5 +86,7 @@ class DiffusionOfInnovations:
         return string
 
 diffusionOfInnovations = DiffusionOfInnovations()
-diffusionOfInnovations.diffusionRun(1)
-diffusionOfInnovations.diffusionRun(2)
+# diffusionOfInnovations.diffusionRun(1)
+# diffusionOfInnovations.diffusionRun(2)
+for i in range(3):
+    diffusionOfInnovations.cascadeRuns()
